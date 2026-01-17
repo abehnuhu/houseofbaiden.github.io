@@ -301,10 +301,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.85);
             z-index: 2000;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
         .login-modal.active {
@@ -315,10 +316,11 @@
             background-color: var(--charcoal);
             padding: 40px;
             border-radius: 10px;
-            width: 90%;
+            width: 100%;
             max-width: 400px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(196, 167, 71, 0.2);
+            position: relative;
         }
 
         .login-header {
@@ -405,6 +407,11 @@
             font-size: 1.5rem;
             cursor: pointer;
             transition: var(--transition);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .close-modal:hover {
@@ -430,6 +437,14 @@
             align-items: center;
             gap: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .admin-btn:hover {
+            background-color: var(--dark-gold);
+            transform: translateY(-2px);
         }
 
         /* Location Section */
@@ -551,6 +566,13 @@
         .fade-in.visible {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
 
         /* Responsive Styles */
@@ -770,9 +792,9 @@
 
     <!-- Admin Panel Link -->
     <div class="admin-link">
-        <a href="#" class="admin-btn" id="adminLink">
+        <button class="admin-btn" id="adminLink">
             <i class="fas fa-cog"></i> Manage Products
-        </a>
+        </button>
     </div>
 
     <!-- Footer -->
@@ -902,17 +924,6 @@
             alert('Password Hint: "baidenrules"\n\nContact Admin: +233 55 414 2949');
         });
 
-        // Add shake animation for error
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-            }
-        `;
-        document.head.appendChild(style);
-
         // Load Products from localStorage
         function loadProducts() {
             const container = document.getElementById('products-container');
@@ -924,9 +935,9 @@
                 container.innerHTML = `
                     <div style="text-align: center; grid-column: 1/-1; padding: 40px;">
                         <p>No products yet. Add products in the admin panel.</p>
-                        <a href="#" id="adminLink2" class="btn" style="margin-top: 20px;">
+                        <button id="adminLink2" class="btn" style="margin-top: 20px;">
                             <i class="fas fa-plus"></i> Add Products
-                        </a>
+                        </button>
                     </div>
                 `;
                 
