@@ -293,6 +293,124 @@
             margin: 10px 0;
         }
 
+        /* Login Modal */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-modal.active {
+            display: flex;
+        }
+
+        .login-container {
+            background-color: var(--charcoal);
+            padding: 40px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(196, 167, 71, 0.2);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h3 {
+            font-size: 1.8rem;
+            color: var(--muted-gold);
+        }
+
+        .login-header p {
+            color: var(--text-gray);
+            margin-top: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--soft-white);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--soft-white);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--muted-gold);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        .login-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            align-items: center;
+        }
+
+        .forgot-password {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .forgot-password:hover {
+            color: var(--muted-gold);
+        }
+
+        .login-btn {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--muted-gold);
+        }
+
         /* Admin Panel Link */
         .admin-link {
             position: fixed;
@@ -481,6 +599,11 @@
                 font-size: 2rem;
             }
 
+            .login-container {
+                padding: 30px 20px;
+                width: 95%;
+            }
+
             .admin-link {
                 bottom: 10px;
                 right: 10px;
@@ -498,6 +621,16 @@
 
             .products-grid, .benefits {
                 grid-template-columns: 1fr;
+            }
+
+            .login-actions {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .forgot-password {
+                text-align: center;
             }
         }
     </style>
@@ -611,9 +744,33 @@
         </div>
     </section>
 
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-container">
+            <button class="close-modal" id="closeModal">&times;</button>
+            <div class="login-header">
+                <h3>Admin Login</h3>
+                <p>Enter password to access admin panel</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
+                <div class="error-message" id="errorMessage">
+                    Incorrect password. Please try again.
+                </div>
+                <button type="submit" class="btn login-btn">Login</button>
+                <div class="login-actions">
+                    <a href="#" class="forgot-password" id="forgotPassword">Forgot Password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Admin Panel Link -->
     <div class="admin-link">
-        <a href="admin.html" class="admin-btn">
+        <a href="#" class="admin-btn" id="adminLink">
             <i class="fas fa-cog"></i> Manage Products
         </a>
     </div>
@@ -636,6 +793,10 @@
     </footer>
 
     <script>
+        // Password Configuration
+        const ADMIN_PASSWORD = "baidenrules";
+        const ADMIN_REDIRECT_URL = "admin.html";
+
         // Mobile Menu Toggle
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.querySelector('.nav-links');
@@ -677,6 +838,81 @@
         
         fadeElements.forEach(el => observer.observe(el));
 
+        // Login Modal Elements
+        const loginModal = document.getElementById('loginModal');
+        const adminLink = document.getElementById('adminLink');
+        const closeModal = document.getElementById('closeModal');
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const forgotPasswordLink = document.getElementById('forgotPassword');
+        const passwordInput = document.getElementById('password');
+
+        // Show login modal when admin link is clicked
+        adminLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.classList.add('active');
+            passwordInput.focus();
+        });
+
+        // Close modal
+        closeModal.addEventListener('click', () => {
+            loginModal.classList.remove('active');
+            errorMessage.classList.remove('visible');
+            loginForm.reset();
+        });
+
+        // Close modal when clicking outside
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.remove('active');
+                errorMessage.classList.remove('visible');
+                loginForm.reset();
+            }
+        });
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = passwordInput.value.trim();
+            
+            if (password === ADMIN_PASSWORD) {
+                // Store login status in localStorage (expires in 1 hour)
+                const loginExpiry = Date.now() + (60 * 60 * 1000);
+                localStorage.setItem('adminLoggedIn', 'true');
+                localStorage.setItem('adminLoginExpiry', loginExpiry);
+                
+                // Redirect to admin panel
+                window.location.href = ADMIN_REDIRECT_URL;
+            } else {
+                errorMessage.classList.add('visible');
+                passwordInput.value = '';
+                passwordInput.focus();
+                
+                // Shake animation for error
+                passwordInput.style.animation = 'none';
+                setTimeout(() => {
+                    passwordInput.style.animation = 'shake 0.5s ease-in-out';
+                }, 10);
+            }
+        });
+
+        // Forgot password feature
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Password Hint: "baidenrules"\n\nContact Admin: +233 55 414 2949');
+        });
+
+        // Add shake animation for error
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+
         // Load Products from localStorage
         function loadProducts() {
             const container = document.getElementById('products-container');
@@ -688,11 +924,19 @@
                 container.innerHTML = `
                     <div style="text-align: center; grid-column: 1/-1; padding: 40px;">
                         <p>No products yet. Add products in the admin panel.</p>
-                        <a href="admin.html" class="btn" style="margin-top: 20px;">
+                        <a href="#" id="adminLink2" class="btn" style="margin-top: 20px;">
                             <i class="fas fa-plus"></i> Add Products
                         </a>
                     </div>
                 `;
+                
+                // Add click event to the new admin link
+                document.getElementById('adminLink2').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loginModal.classList.add('active');
+                    passwordInput.focus();
+                });
+                
                 return;
             }
             
@@ -744,6 +988,15 @@
 
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', loadProducts);
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && loginModal.classList.contains('active')) {
+                loginModal.classList.remove('active');
+                errorMessage.classList.remove('visible');
+                loginForm.reset();
+            }
+        });
     </script>
 </body>
 </html>
